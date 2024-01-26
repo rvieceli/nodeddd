@@ -7,23 +7,39 @@ import { QuestionsRepository } from "@domain/forum/application/repositories/ques
 import { Question } from "@domain/forum/enterprise/entities/question";
 
 import { InMemory } from "./in-memory";
+import { QuestionAttachmentsRepository } from "@domain/forum/application/repositories/question-attachments.repository";
 
 export class InMemoryQuestionsRepository
   extends InMemory<Question>
   implements QuestionsRepository
 {
+  constructor(
+    private readonly _questionAttachmentsRepository: QuestionAttachmentsRepository,
+  ) {
+    super();
+  }
+
   clone(base: Question) {
     return Question.create(
       this.removeUndefined({
         authorId: base.authorId,
         content: base.content,
         title: base.title,
-        bestAnswerId: base.bestAnswerId,
         slug: base.slug,
+        bestAnswerId: base.bestAnswerId,
+        attachments: base.attachments,
         createdAt: base.createdAt,
         updatedAt: base.updatedAt,
       }),
       base.id,
+    );
+  }
+
+  async delete(deleting: Question): Promise<void> {
+    super.delete(deleting);
+
+    await this._questionAttachmentsRepository.deleteManyByQuestionId(
+      deleting.getId(),
     );
   }
 

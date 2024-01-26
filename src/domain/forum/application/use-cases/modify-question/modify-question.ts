@@ -1,4 +1,7 @@
-import { type PrimitiveUniqueId } from "@domain/core/entities/unique-id";
+import {
+  UniqueId,
+  type PrimitiveUniqueId,
+} from "@domain/core/entities/unique-id";
 import { Result } from "@domain/core/errors/result";
 import type { RequireAtLeastOne } from "@domain/core/types/require-at-least-one";
 import { UseCase } from "@domain/core/use-cases/use-case";
@@ -11,6 +14,9 @@ import {
 } from "../../errors/questions.errors";
 
 import { QuestionsRepository } from "../../repositories/questions.repository";
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
+import { QuestionAttachmentList } from "@domain/forum/enterprise/entities/question-attachment-list";
+import { QuestionAttachment } from "@domain/forum/enterprise/entities/question-attachment";
 
 interface ModifyQuestionUseCaseRequest {
   actorId: PrimitiveUniqueId;
@@ -18,6 +24,7 @@ interface ModifyQuestionUseCaseRequest {
   data: RequireAtLeastOne<{
     title: string;
     content: string;
+    attachmentIds?: PrimitiveUniqueId[];
   }>;
 }
 
@@ -34,7 +41,10 @@ export class ModifyQuestionUseCase
   implements
     UseCase<ModifyQuestionUseCaseRequest, ModifyQuestionUseCaseResponse>
 {
-  constructor(private readonly _questionsRepository: QuestionsRepository) {}
+  constructor(
+    private readonly _questionsRepository: QuestionsRepository,
+    private readonly _questionAttachmentsRepository: QuestionAttachmentsRepository,
+  ) {}
 
   async execute({
     actorId,
@@ -51,8 +61,27 @@ export class ModifyQuestionUseCase
       return Result.fail(new QuestionModificationNotAllowed());
     }
 
-    if (data.title) question.title = data.title;
-    if (data.content) question.content = data.content;
+    const { title, content, attachmentIds } = data;
+
+    if (title) question.title = title;
+    if (content) question.content = content;
+
+    if (attachmentIds) {
+      const currentAttachments =
+        await this._questionAttachmentsRepository.findManyByQuestionId(
+          questionId,
+        );
+
+      const upcomingAttachments = attachmentIds.map((id) =>
+        QuestionAttachment.create({
+          attachmentId: UniqueId.create(id),
+          questionId: question.id,
+        }),
+      );
+
+      question.attachments = new QuestionAttachmentList(currentAttachments);
+      question.attachments.update(upcomingAttachments);
+    }
 
     await this._questionsRepository.save(question);
 

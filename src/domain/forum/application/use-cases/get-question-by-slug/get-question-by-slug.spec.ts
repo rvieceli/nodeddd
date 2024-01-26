@@ -1,19 +1,26 @@
 import { makeQuestion } from "@test/factories/make-question";
 
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
 
 import { QuestionNotFound } from "../../errors/questions.errors";
 
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
 
 import { GetQuestionBySlugUseCase } from "./get-question-by-slug";
 
 describe("Get Question By Slug [UseCase]", () => {
   let questionsRepository: QuestionsRepository;
+  let questionAttachmentsRepository: QuestionAttachmentsRepository;
   let sut: GetQuestionBySlugUseCase;
 
   beforeEach(() => {
-    questionsRepository = new InMemoryQuestionsRepository();
+    questionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository();
+    questionsRepository = new InMemoryQuestionsRepository(
+      questionAttachmentsRepository,
+    );
+
     sut = new GetQuestionBySlugUseCase(questionsRepository);
 
     vi.spyOn(questionsRepository, "findBySlug");

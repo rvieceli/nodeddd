@@ -1,18 +1,25 @@
 import { makeMany } from "@test/factories/make-many";
 import { makeQuestion } from "@test/factories/make-question";
 
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
 
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
 
 import { FetchRecentQuestionsUseCase } from "./fetch-recent-questions";
 
 describe("Fetch Recent Questions [Use Case]", () => {
   let questionsRepository: QuestionsRepository;
+  let questionAttachmentsRepository: QuestionAttachmentsRepository;
   let sut: FetchRecentQuestionsUseCase;
 
   beforeEach(() => {
-    questionsRepository = new InMemoryQuestionsRepository();
+    questionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository();
+    questionsRepository = new InMemoryQuestionsRepository(
+      questionAttachmentsRepository,
+    );
+
     sut = new FetchRecentQuestionsUseCase(questionsRepository);
 
     vi.spyOn(questionsRepository, "findManyRecent");

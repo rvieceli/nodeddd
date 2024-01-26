@@ -1,5 +1,6 @@
 import { makeQuestion } from "@test/factories/make-question";
 
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
@@ -9,16 +10,22 @@ import {
   QuestionNotFound,
 } from "../../errors/questions.errors";
 
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
 
 import { DeleteQuestionUseCase } from "./delete-question";
 
 describe("Delete Question [Use Case]", () => {
   let questionsRepository: QuestionsRepository;
+  let questionAttachmentsRepository: QuestionAttachmentsRepository;
   let sut: DeleteQuestionUseCase;
 
   beforeEach(() => {
-    questionsRepository = new InMemoryQuestionsRepository();
+    questionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository();
+    questionsRepository = new InMemoryQuestionsRepository(
+      questionAttachmentsRepository,
+    );
+
     sut = new DeleteQuestionUseCase(questionsRepository);
 
     vi.spyOn(questionsRepository, "delete");

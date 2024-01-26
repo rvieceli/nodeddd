@@ -1,7 +1,8 @@
 import { makeQuestion } from "@test/factories/make-question";
 
-import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 import { InMemoryQuestionCommentsRepository } from "@test/repositories/in-memory.question-comments.repository";
+import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
@@ -9,18 +10,24 @@ import { QuestionComment } from "@domain/forum/enterprise/entities/question-comm
 
 import { QuestionNotFound } from "../../errors/questions.errors";
 
-import { QuestionsRepository } from "../../repositories/questions.repository";
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 import { QuestionCommentsRepository } from "../../repositories/question-comments.repository";
+import { QuestionsRepository } from "../../repositories/questions.repository";
 
 import { CommentOnQuestionUseCase } from "./comment-on-question";
 
 describe("Comment on Question [Use Case]", () => {
   let questionsRepository: QuestionsRepository;
   let commentsRepository: QuestionCommentsRepository;
+  let questionAttachmentsRepository: QuestionAttachmentsRepository;
   let sut: CommentOnQuestionUseCase;
 
   beforeEach(() => {
-    questionsRepository = new InMemoryQuestionsRepository();
+    questionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository();
+    questionsRepository = new InMemoryQuestionsRepository(
+      questionAttachmentsRepository,
+    );
+
     commentsRepository = new InMemoryQuestionCommentsRepository();
     sut = new CommentOnQuestionUseCase(questionsRepository, commentsRepository);
 

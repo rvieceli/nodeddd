@@ -1,6 +1,9 @@
+import { makeMany } from "@test/factories/make-many";
 import { makeQuestion } from "@test/factories/make-question";
+import { makeQuestionAttachment } from "@test/factories/make-question-attachment";
 
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
@@ -10,18 +13,27 @@ import {
 } from "../../errors/questions.errors";
 
 import { QuestionsRepository } from "../../repositories/questions.repository";
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 
 import { ModifyQuestionUseCase } from "./modify-question";
 
 describe("Modify Question [Use Case]", () => {
   let questionsRepository: QuestionsRepository;
+  let questionAttachmentsRepository: QuestionAttachmentsRepository;
   let sut: ModifyQuestionUseCase;
 
   beforeEach(() => {
-    questionsRepository = new InMemoryQuestionsRepository();
-    sut = new ModifyQuestionUseCase(questionsRepository);
+    questionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository();
+    questionsRepository = new InMemoryQuestionsRepository(
+      questionAttachmentsRepository,
+    );
+    sut = new ModifyQuestionUseCase(
+      questionsRepository,
+      questionAttachmentsRepository,
+    );
 
     vi.spyOn(questionsRepository, "save");
+    vi.spyOn(questionAttachmentsRepository, "findManyByQuestionId");
   });
 
   afterEach(() => {
@@ -61,54 +73,165 @@ describe("Modify Question [Use Case]", () => {
       },
     });
     expect(questionsRepository.save).toHaveBeenNthCalledWith(1, updated);
+    expect(
+      questionAttachmentsRepository.findManyByQuestionId,
+    ).not.toHaveBeenCalled();
   });
 
-  it("should throw an error if actor is not the author", async () => {
-    // prepare
-    const authorId = UniqueId.create();
+  describe("when the question have attachments", () => {
+    it("should be able to update the attachments", async () => {
+      // prepare
+      const authorId = UniqueId.create();
 
-    const question = makeQuestion({
-      content: "Old content",
-      title: "Old title",
-      authorId,
+      const original = makeQuestion({
+        content: "Old content",
+        title: "Old title",
+        authorId,
+      });
+
+      await questionsRepository.create(original);
+
+      const attachments = await makeMany(async () => {
+        const questionAttachment = makeQuestionAttachment({
+          questionId: original.id,
+        });
+        await questionAttachmentsRepository.create(questionAttachment);
+        return questionAttachment;
+      }, 3);
+
+      const attachmentId = attachments[1].attachmentId.getId();
+
+      // act
+      const result = await sut.execute({
+        actorId: authorId.getId(),
+        questionId: original.getId(),
+        data: {
+          title: "New title",
+          attachmentIds: [attachmentId],
+        },
+      });
+
+      const { question: updated } = result.unwrap();
+
+      // assert
+      expect(original).not.toMatchObject(updated);
+      expect(updated).toMatchObject({
+        props: {
+          title: "New title",
+        },
+      });
+
+      expect(updated.attachments?.currentItems).toHaveLength(1);
+
+      expect(questionsRepository.save).toHaveBeenNthCalledWith(1, updated);
+      expect(
+        questionAttachmentsRepository.findManyByQuestionId,
+      ).toHaveBeenNthCalledWith(1, original.getId());
     });
 
-    await questionsRepository.create(question);
+    it("should not update the attachments if not passed a new one (0..n)", async () => {
+      // prepare
+      const authorId = UniqueId.create();
 
-    const questionId = question.getId();
-    const actorId = UniqueId.getId();
+      const original = makeQuestion({
+        content: "Old content",
+        title: "Old title",
+        authorId,
+      });
 
-    // act
-    const result = await sut.execute({
-      actorId,
-      questionId,
-      data: {
-        title: "New title",
-      },
+      await questionsRepository.create(original);
+
+      await makeMany(async () => {
+        const questionAttachment = makeQuestionAttachment({
+          questionId: original.id,
+        });
+        await questionAttachmentsRepository.create(questionAttachment);
+        return questionAttachment;
+      }, 3);
+
+      // act
+      const result = await sut.execute({
+        actorId: authorId.getId(),
+        questionId: original.getId(),
+        data: {
+          title: "New title",
+        },
+      });
+
+      const { question: updated } = result.unwrap();
+
+      // assert
+      expect(original).not.toMatchObject(updated);
+      expect(updated).toMatchObject({
+        props: {
+          title: "New title",
+        },
+      });
+
+      expect(updated.attachments).toBeUndefined();
+
+      expect(questionsRepository.save).toHaveBeenNthCalledWith(1, updated);
+      expect(
+        questionAttachmentsRepository.findManyByQuestionId,
+      ).not.toHaveBeenCalled();
+
+      const attachments =
+        await questionAttachmentsRepository.findManyByQuestionId(
+          original.getId(),
+        );
+
+      expect(attachments).toHaveLength(3);
     });
-
-    // assert
-    expect(authorId.getId()).not.toBe(actorId);
-    expect(result.value).toBeInstanceOf(QuestionModificationNotAllowed);
-    expect(questionsRepository.save).not.toHaveBeenCalled();
   });
 
-  it("should throw an error if question does not exist", async () => {
-    // prepare
-    const questionId = UniqueId.getId();
-    const actorId = UniqueId.getId();
+  describe("when the question can't be modified [ERROR]", () => {
+    it("should result an error if actor is not the author", async () => {
+      // prepare
+      const authorId = UniqueId.create();
 
-    // act
-    const result = await sut.execute({
-      questionId,
-      actorId,
-      data: {
-        title: "New title",
-      },
+      const question = makeQuestion({
+        content: "Old content",
+        title: "Old title",
+        authorId,
+      });
+
+      await questionsRepository.create(question);
+
+      const questionId = question.getId();
+      const actorId = UniqueId.getId();
+
+      // act
+      const result = await sut.execute({
+        actorId,
+        questionId,
+        data: {
+          title: "New title",
+        },
+      });
+
+      // assert
+      expect(authorId.getId()).not.toBe(actorId);
+      expect(result.value).toBeInstanceOf(QuestionModificationNotAllowed);
+      expect(questionsRepository.save).not.toHaveBeenCalled();
     });
 
-    // assert
-    expect(result.value).toBeInstanceOf(QuestionNotFound);
-    expect(questionsRepository.save).not.toHaveBeenCalled();
+    it("should result an error if question does not exist", async () => {
+      // prepare
+      const questionId = UniqueId.getId();
+      const actorId = UniqueId.getId();
+
+      // act
+      const result = await sut.execute({
+        questionId,
+        actorId,
+        data: {
+          title: "New title",
+        },
+      });
+
+      // assert
+      expect(result.value).toBeInstanceOf(QuestionNotFound);
+      expect(questionsRepository.save).not.toHaveBeenCalled();
+    });
   });
 });
