@@ -1,0 +1,33 @@
+{
+  "name": "nodeddd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint:check": "eslint src/**",
+    "lint:fix": "eslint --fix src",
+    "prettier:check": "prettier --check src",
+    "prettier:fix": "prettier --write src",
+    "format:check": "npm run lint:check && npm run prettier:check",
+    "format:fix": "npm run lint:fix && npm run prettier:fix",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "eslint": "^8.56.0",
+    "husky": "^8.0.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3",
+    "vite-tsconfig-paths": "^4.3.1",
+    "vitest": "^1.2.1"
+  }
+}

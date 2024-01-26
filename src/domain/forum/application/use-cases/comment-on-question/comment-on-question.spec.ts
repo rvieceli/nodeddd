@@ -1,0 +1,83 @@
+import { makeQuestion } from "@test/factories/make-question";
+
+import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
+import { InMemoryQuestionCommentsRepository } from "@test/repositories/in-memory.question-comments.repository";
+
+import { UniqueId } from "@domain/core/entities/unique-id";
+
+import { QuestionComment } from "@domain/forum/enterprise/entities/question-comment";
+
+import { QuestionNotFound } from "../../errors/questions.errors";
+
+import { QuestionsRepository } from "../../repositories/questions.repository";
+import { QuestionCommentsRepository } from "../../repositories/question-comments.repository";
+
+import { CommentOnQuestionUseCase } from "./comment-on-question";
+
+describe("Comment on Question [Use Case]", () => {
+  let questionsRepository: QuestionsRepository;
+  let commentsRepository: QuestionCommentsRepository;
+  let sut: CommentOnQuestionUseCase;
+
+  beforeEach(() => {
+    questionsRepository = new InMemoryQuestionsRepository();
+    commentsRepository = new InMemoryQuestionCommentsRepository();
+    sut = new CommentOnQuestionUseCase(questionsRepository, commentsRepository);
+
+    vi.spyOn(questionsRepository, "findById");
+    vi.spyOn(commentsRepository, "create");
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it("should be able to create a comment", async () => {
+    //prepare
+    const question = makeQuestion();
+
+    await questionsRepository.create(question);
+
+    const questionId = question.getId();
+    const actorId = UniqueId.getId();
+
+    //act
+    const result = await sut.execute({
+      questionId,
+      actorId,
+      content: "This is a comment",
+    });
+
+    const { comment } = result.unwrap();
+
+    //assert
+    expect(comment).toBeInstanceOf(QuestionComment);
+    expect(comment).toMatchObject({
+      content: "This is a comment",
+      questionId: question.id,
+      authorId: UniqueId.create(actorId),
+    });
+
+    expect(questionsRepository.findById).toHaveBeenNthCalledWith(1, questionId);
+    expect(commentsRepository.create).toHaveBeenNthCalledWith(1, comment);
+  });
+
+  it("should throw an error when answer does not exist", async () => {
+    //prepare
+    const actorId = UniqueId.getId();
+    const questionId = UniqueId.getId();
+
+    //act
+    const result = await sut.execute({
+      actorId,
+      questionId,
+      content: "This is a comment",
+    });
+
+    //assert
+    expect(result.value).toBeInstanceOf(QuestionNotFound);
+
+    expect(questionsRepository.findById).toHaveBeenNthCalledWith(1, questionId);
+    expect(commentsRepository.create).not.toHaveBeenCalled();
+  });
+});
