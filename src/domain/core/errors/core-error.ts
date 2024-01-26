@@ -6,7 +6,7 @@ enum ErrorType {
   Conflict,
 }
 
-class CoreError extends Error {
+abstract class CoreError extends Error {
   readonly code: string;
   readonly type: ErrorType;
 
