@@ -35,7 +35,9 @@ export abstract class InMemory<Entity extends EntityBase<unknown>> {
     const index = this.store.findIndex((item) => item.id.equals(replacing));
 
     if (index === -1)
-      console.warn("InMemory: Trying to replace an item that does not exist");
+      throw new Error(
+        "InMemory: Trying to replace an item that does not exist",
+      );
 
     this.store[index] = this.clone(replacing);
   }
