@@ -13,6 +13,8 @@ export class Result<Ok, Fail> {
     return this._value;
   }
 
+  static ok(): Result<void, never>;
+  static ok<Ok>(data: Ok): Result<Ok, never>;
   static ok<Ok>(data?: Ok): Result<Ok, never> {
     return new Result(true, data);
   }
