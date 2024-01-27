@@ -3,6 +3,10 @@ import { Notification } from "@domain/notification/enterprise/entities/notificat
 import { NotificationsRepository } from "@domain/notification/application/repositories/notifications.repository";
 
 import { InMemory } from "./in-memory";
+import {
+  PaginatedRequest,
+  PaginatedResponse,
+} from "@domain/core/repository/pagination";
 
 export class InMemoryNotificationsRepository
   extends InMemory<Notification>
@@ -19,5 +23,16 @@ export class InMemoryNotificationsRepository
       },
       base.id,
     );
+  }
+
+  async findManyByRecipientId(
+    recipientId: string,
+    pagination: PaginatedRequest,
+  ): Promise<PaginatedResponse<Notification>> {
+    const items = this.store
+      .filter((item) => item.recipientId.equals(recipientId))
+      .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return this.paginate(items, pagination);
   }
 }
