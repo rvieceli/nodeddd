@@ -1,8 +1,14 @@
 import { randomUUID } from "crypto";
 
-import { Entity } from "./entity";
-
 export type PrimitiveUniqueId = string;
+
+interface AnyWithGetId {
+  getId(): PrimitiveUniqueId;
+}
+
+function isAnyWithGetId(instance: unknown): instance is AnyWithGetId {
+  return !!instance && typeof instance === "object" && "getId" in instance;
+}
 
 export class UniqueId {
   private _value: PrimitiveUniqueId;
@@ -31,11 +37,9 @@ export class UniqueId {
     return this._value;
   }
 
-  equals(id: UniqueId | Entity<unknown> | PrimitiveUniqueId) {
-    if (id instanceof UniqueId) return this._value === id._value;
-
-    if (id instanceof Entity) return this._value === id.getId();
-
-    return this._value === id;
+  equals(instance: UniqueId | AnyWithGetId | PrimitiveUniqueId) {
+    if (instance instanceof UniqueId) return this._value === instance._value;
+    if (isAnyWithGetId(instance)) return this._value === instance.getId();
+    return this._value === instance;
   }
 }
