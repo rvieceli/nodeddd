@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "type:check": "npx tsc --noEmit --skipLibCheck",
     "lint:check": "eslint src/**",
     "lint:fix": "eslint --fix src",
     "prettier:check": "prettier --check src",
