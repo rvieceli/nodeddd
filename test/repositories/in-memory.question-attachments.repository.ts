@@ -16,6 +16,10 @@ export class InMemoryQuestionAttachmentsRepository
     ); // should the id be kept?
   }
 
+  async createMany(questionAttachments: QuestionAttachment[]): Promise<void> {
+    await Promise.all(questionAttachments.map(this.save));
+  }
+
   async findManyByQuestionId(
     questionId: string,
   ): Promise<QuestionAttachment[]> {
@@ -24,5 +28,11 @@ export class InMemoryQuestionAttachmentsRepository
 
   async deleteManyByQuestionId(questionId: string): Promise<void> {
     this.store = this.store.filter((qa) => !qa.questionId.equals(questionId));
+  }
+
+  async deleteManyByAttachmentIds(questionIds: string[]): Promise<void> {
+    this.store = this.store.filter(
+      (qa) => !questionIds.includes(qa.attachmentId.getId()),
+    );
   }
 }

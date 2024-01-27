@@ -78,7 +78,7 @@ describe("Modify Question [Use Case]", () => {
     ).not.toHaveBeenCalled();
   });
 
-  describe("when the question have attachments", () => {
+  describe("when the question has attachments", () => {
     it("should be able to update the attachments", async () => {
       // prepare
       const authorId = UniqueId.create();

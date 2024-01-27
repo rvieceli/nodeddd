@@ -1,10 +1,11 @@
 import { makeAnswer } from "@test/factories/make-answer";
 import { makeQuestion } from "@test/factories/make-question";
 
-import { InMemoryAnswerCommentsRepository } from "@test/repositories/in-memory.answer-comments.repository";
 import { InMemoryAnswersRepository } from "@test/repositories/in-memory.answers.repository";
-import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/in-memory.answers-attachments.repository";
+import { InMemoryAnswerCommentsRepository } from "@test/repositories/in-memory.answer-comments.repository";
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
@@ -12,18 +13,20 @@ import { AnswerComment } from "@domain/forum/enterprise/entities/answer-comment"
 
 import { AnswerNotFound } from "../../errors/answers.errors";
 
-import { AnswerCommentsRepository } from "../../repositories/answer-comments.repository";
 import { AnswersRepository } from "../../repositories/answers.repository";
-import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
+import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
+import { AnswerCommentsRepository } from "../../repositories/answer-comments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 
 import { CommentOnAnswerUseCase } from "./comment-on-answer";
 
 describe("Comment on Answer [Use Case]", () => {
   let questionsRepository: QuestionsRepository;
-  let answersRepository: AnswersRepository;
-  let commentsRepository: AnswerCommentsRepository;
   let questionAttachmentsRepository: QuestionAttachmentsRepository;
+  let answersRepository: AnswersRepository;
+  let answerAttachmentsRepository: AnswerAttachmentsRepository;
+  let commentsRepository: AnswerCommentsRepository;
   let sut: CommentOnAnswerUseCase;
 
   beforeEach(() => {
@@ -31,7 +34,12 @@ describe("Comment on Answer [Use Case]", () => {
     questionsRepository = new InMemoryQuestionsRepository(
       questionAttachmentsRepository,
     );
-    answersRepository = new InMemoryAnswersRepository();
+
+    answerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository();
+    answersRepository = new InMemoryAnswersRepository(
+      answerAttachmentsRepository,
+    );
+
     commentsRepository = new InMemoryAnswerCommentsRepository();
     sut = new CommentOnAnswerUseCase(answersRepository, commentsRepository);
 

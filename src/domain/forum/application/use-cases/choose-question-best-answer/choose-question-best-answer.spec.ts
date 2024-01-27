@@ -2,8 +2,9 @@ import { makeAnswer } from "@test/factories/make-answer";
 import { makeQuestion } from "@test/factories/make-question";
 
 import { InMemoryAnswersRepository } from "@test/repositories/in-memory.answers.repository";
-import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/in-memory.answers-attachments.repository";
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
+import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
@@ -14,19 +15,25 @@ import {
 } from "../../errors/questions.errors";
 
 import { AnswersRepository } from "../../repositories/answers.repository";
-import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
+import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
+import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 
 import { ChooseQuestionBestAnswerUseCase } from "./choose-question-best-answer";
 
 describe("Choose Question Best Answer [Use Case]", () => {
   let answersRepository: AnswersRepository;
+  let answerAttachmentsRepository: AnswerAttachmentsRepository;
   let questionsRepository: QuestionsRepository;
   let questionAttachmentsRepository: QuestionAttachmentsRepository;
   let sut: ChooseQuestionBestAnswerUseCase;
 
   beforeEach(() => {
-    answersRepository = new InMemoryAnswersRepository();
+    answerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository();
+    answersRepository = new InMemoryAnswersRepository(
+      answerAttachmentsRepository,
+    );
+
     questionAttachmentsRepository = new InMemoryQuestionAttachmentsRepository();
     questionsRepository = new InMemoryQuestionsRepository(
       questionAttachmentsRepository,

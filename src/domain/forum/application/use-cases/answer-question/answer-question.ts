@@ -6,15 +6,19 @@ import { Result } from "@domain/core/errors/result";
 import { UseCase } from "@domain/core/use-cases/use-case";
 
 import { Answer } from "@domain/forum/enterprise/entities/answer";
+import { AnswerAttachmentList } from "@domain/forum/enterprise/entities/answer-attachment-list";
+import { AnswerAttachment } from "@domain/forum/enterprise/entities/answer-attachment";
+
+import { QuestionNotFound } from "../../errors/questions.errors";
 
 import { AnswersRepository } from "../../repositories/answers.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
-import { QuestionNotFound } from "../../errors/questions.errors";
 
 interface AnswerQuestionRequest {
   questionId: PrimitiveUniqueId;
   actorId: PrimitiveUniqueId;
   content: string;
+  attachmentIds?: PrimitiveUniqueId[];
 }
 
 interface Payload {
@@ -35,6 +39,7 @@ export class AnswerQuestionUseCase
     actorId,
     questionId,
     content,
+    attachmentIds,
   }: AnswerQuestionRequest): Promise<AnswerQuestionResponse> {
     const question = await this._questionsRepository.findById(questionId);
 
@@ -47,6 +52,15 @@ export class AnswerQuestionUseCase
       questionId: question.id,
       authorId: UniqueId.create(actorId),
     });
+
+    const attachments = attachmentIds?.map((id) =>
+      AnswerAttachment.create({
+        attachmentId: UniqueId.create(id),
+        answerId: answer.id,
+      }),
+    );
+
+    answer.attachments = new AnswerAttachmentList(attachments);
 
     await this._answersRepository.create(answer);
 

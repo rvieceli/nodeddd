@@ -6,6 +6,8 @@ interface AnswerAttachmentProps {
   attachmentId: UniqueId;
 }
 
+export type CreateAnswerAttachmentProps = AnswerAttachmentProps;
+
 export class AnswerAttachment extends Entity<AnswerAttachmentProps> {
   static create(props: AnswerAttachmentProps, id?: UniqueId): AnswerAttachment {
     return new AnswerAttachment(props, id);

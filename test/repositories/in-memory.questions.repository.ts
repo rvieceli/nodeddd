@@ -3,11 +3,13 @@ import {
   PaginatedResponse,
 } from "@domain/core/repository/pagination";
 
-import { QuestionsRepository } from "@domain/forum/application/repositories/questions.repository";
 import { Question } from "@domain/forum/enterprise/entities/question";
+import { QuestionAttachmentList } from "@domain/forum/enterprise/entities/question-attachment-list";
+
+import { QuestionsRepository } from "@domain/forum/application/repositories/questions.repository";
+import { QuestionAttachmentsRepository } from "@domain/forum/application/repositories/question-attachments.repository";
 
 import { InMemory } from "./in-memory";
-import { QuestionAttachmentsRepository } from "@domain/forum/application/repositories/question-attachments.repository";
 
 export class InMemoryQuestionsRepository
   extends InMemory<Question>
@@ -32,6 +34,23 @@ export class InMemoryQuestionsRepository
         updatedAt: base.updatedAt,
       }),
       base.id,
+    );
+  }
+
+  async save(saving: Question): Promise<void> {
+    await super.save(saving);
+
+    if (saving.attachments) {
+      await this.syncAttachments(saving.attachments);
+    }
+  }
+
+  private async syncAttachments(attachmentList: QuestionAttachmentList) {
+    await this._questionAttachmentsRepository.deleteManyByAttachmentIds(
+      attachmentList.getRemovedItems().map((a) => a.attachmentId.getId()),
+    );
+    await this._questionAttachmentsRepository.createMany(
+      attachmentList.getNewItems(),
     );
   }
 

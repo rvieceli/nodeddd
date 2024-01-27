@@ -3,13 +3,13 @@ import {
   UniqueId,
 } from "@domain/core/entities/unique-id";
 import { Result } from "@domain/core/errors/result";
-
 import { UseCase } from "@domain/core/use-cases/use-case";
-import { Question } from "@domain/forum/enterprise/entities/question";
 
-import { QuestionsRepository } from "../../repositories/questions.repository";
+import { Question } from "@domain/forum/enterprise/entities/question";
 import { QuestionAttachment } from "@domain/forum/enterprise/entities/question-attachment";
 import { QuestionAttachmentList } from "@domain/forum/enterprise/entities/question-attachment-list";
+
+import { QuestionsRepository } from "../../repositories/questions.repository";
 
 interface CreateQuestionUseCaseRequest {
   title: string;
@@ -34,7 +34,7 @@ export class CreateQuestionUseCase
     authorId,
     title,
     content,
-    attachmentIds: attachmentsIds,
+    attachmentIds,
   }: CreateQuestionUseCaseRequest): Promise<CreateQuestionUseCaseResponse> {
     const question = Question.create({
       authorId: UniqueId.create(authorId),
@@ -42,7 +42,7 @@ export class CreateQuestionUseCase
       content,
     });
 
-    const attachments = attachmentsIds?.map((id) =>
+    const attachments = attachmentIds?.map((id) =>
       QuestionAttachment.create({
         attachmentId: UniqueId.create(id),
         questionId: question.id,

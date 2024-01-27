@@ -2,11 +2,13 @@ import { Entity } from "@domain/core/entities/entity";
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import type { Optional } from "@domain/core/types/optional";
+import { AnswerAttachmentList } from "./answer-attachment-list";
 
 interface AnswerProps {
   content: string;
   questionId: UniqueId;
   authorId: UniqueId;
+  attachments?: AnswerAttachmentList;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -50,6 +52,10 @@ export class Answer extends Entity<AnswerProps> {
     return this.props.authorId;
   }
 
+  get attachments(): AnswerAttachmentList | undefined {
+    return this.props.attachments;
+  }
+
   get createdAt() {
     return this.props.createdAt;
   }
@@ -60,6 +66,11 @@ export class Answer extends Entity<AnswerProps> {
 
   set content(value: string) {
     this.props.content = value;
+    this.touch();
+  }
+
+  set attachments(value: AnswerAttachmentList) {
+    this.props.attachments = value;
     this.touch();
   }
 }

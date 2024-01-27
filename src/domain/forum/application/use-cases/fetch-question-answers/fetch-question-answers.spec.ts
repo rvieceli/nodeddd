@@ -2,20 +2,26 @@ import { makeAnswer } from "@test/factories/make-answer";
 import { makeMany } from "@test/factories/make-many";
 
 import { InMemoryAnswersRepository } from "@test/repositories/in-memory.answers.repository";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/in-memory.answers-attachments.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import { AnswersRepository } from "../../repositories/answers.repository";
+import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
 
 import { FetchQuestionAnswersUseCase } from "./fetch-question-answers";
 
 describe("Fetch Question Answers [Use Case]", () => {
   let answersRepository: AnswersRepository;
+  let answerAttachmentsRepository: AnswerAttachmentsRepository;
 
   let sut: FetchQuestionAnswersUseCase;
 
   beforeEach(() => {
-    answersRepository = new InMemoryAnswersRepository();
+    answerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository();
+    answersRepository = new InMemoryAnswersRepository(
+      answerAttachmentsRepository,
+    );
     sut = new FetchQuestionAnswersUseCase(answersRepository);
 
     vi.spyOn(answersRepository, "findManyByQuestionId");

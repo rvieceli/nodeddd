@@ -1,6 +1,7 @@
 import { makeAnswer } from "@test/factories/make-answer";
 
 import { InMemoryAnswersRepository } from "@test/repositories/in-memory.answers.repository";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/in-memory.answers-attachments.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
@@ -10,15 +11,20 @@ import {
 } from "../../errors/answers.errors";
 
 import { AnswersRepository } from "../../repositories/answers.repository";
+import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
 
 import { DeleteAnswerUseCase } from "./delete-answer";
 
 describe("Delete Answer [Use Case]", () => {
   let answersRepository: AnswersRepository;
+  let answerAttachmentsRepository: AnswerAttachmentsRepository;
   let sut: DeleteAnswerUseCase;
 
   beforeEach(() => {
-    answersRepository = new InMemoryAnswersRepository();
+    answerAttachmentsRepository = new InMemoryAnswerAttachmentsRepository();
+    answersRepository = new InMemoryAnswersRepository(
+      answerAttachmentsRepository,
+    );
     sut = new DeleteAnswerUseCase(answersRepository);
 
     vi.spyOn(answersRepository, "delete");
