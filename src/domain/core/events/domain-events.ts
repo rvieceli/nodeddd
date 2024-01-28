@@ -2,10 +2,14 @@ import { type AggregateRoot } from "../entities/aggregate-root";
 import { UniqueId } from "../entities/unique-id";
 import { DomainEvent } from "./domain-event";
 
-type DomainEventCallback = (event: unknown) => void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DomainEventCallback<T extends DomainEvent> = (event: T) => Promise<void>;
 
 export class DomainEvents {
-  private static handlersMap: Record<string, DomainEventCallback[]> = {};
+  private static handlersMap: Record<
+    string,
+    DomainEventCallback<DomainEvent>[]
+  > = {};
   private static marked: AggregateRoot<unknown>[] = [];
 
   public static markForDispatch(entity: AggregateRoot<unknown>) {
@@ -21,10 +25,10 @@ export class DomainEvents {
   }
 
   private static dispatchEvents(entity: AggregateRoot<unknown>) {
-    entity.domainEvents.forEach((event) => this.dispatch(event));
+    entity.domainEvents.map((event) => this.dispatch(event));
   }
 
-  static dispatch(event: DomainEvent) {
+  static dispatch<T extends DomainEvent>(event: T) {
     const eventClassName = event.constructor.name;
 
     const isEventRegistered = eventClassName in this.handlersMap;
@@ -54,8 +58,8 @@ export class DomainEvents {
     this.removeFromMarkedDispatchList(entity);
   }
 
-  public static register(
-    callback: DomainEventCallback,
+  public static register<T extends DomainEvent>(
+    handler: DomainEventCallback<T>,
     eventClassName: string,
   ) {
     const wasEventAlreadyRegistered = eventClassName in this.handlersMap;
@@ -64,7 +68,9 @@ export class DomainEvents {
       this.handlersMap[eventClassName] = [];
     }
 
-    this.handlersMap[eventClassName].push(callback);
+    this.handlersMap[eventClassName].push(
+      handler as DomainEventCallback<DomainEvent>,
+    );
   }
 
   public static clearHandlers() {

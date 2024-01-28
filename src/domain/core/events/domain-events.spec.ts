@@ -1,5 +1,4 @@
 import { AggregateRoot } from "../entities/aggregate-root";
-import { UniqueId } from "../entities/unique-id";
 import { DomainEvent } from "./domain-event";
 import { DomainEvents } from "./domain-events";
 
@@ -9,10 +8,6 @@ describe("DomainEvents", () => {
 
     constructor(private aggregate: DummyAggregate) {
       this.occurredAt = new Date();
-    }
-
-    getAggregateId(): UniqueId {
-      return this.aggregate.id;
     }
   }
 
@@ -24,7 +19,7 @@ describe("DomainEvents", () => {
     }
   }
 
-  it("should be able to dispatch and listen to events", () => {
+  it("should be able to dispatch and listen to events", async () => {
     const listener = vi.fn();
 
     DomainEvents.register(listener, DummyAggregateCreatedEvent.name);
