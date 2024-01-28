@@ -1,8 +1,9 @@
-import { Entity } from "@domain/core/entities/entity";
+import { AggregateRoot } from "@domain/core/entities/aggregate-root";
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import type { Optional } from "@domain/core/types/optional";
 import { AnswerAttachmentList } from "./answer-attachment-list";
+import { AnswerCreatedEvent } from "../events/answer-created.event";
 
 interface AnswerProps {
   content: string;
@@ -17,9 +18,9 @@ export type CreateAnswerProps = Optional<AnswerProps, "createdAt">;
 
 const EXCERPT_LENGTH = 120;
 
-export class Answer extends Entity<AnswerProps> {
+export class Answer extends AggregateRoot<AnswerProps> {
   static create(props: CreateAnswerProps, id?: UniqueId): Answer {
-    const answer = new Answer(
+    const instance = new Answer(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
@@ -27,7 +28,13 @@ export class Answer extends Entity<AnswerProps> {
       id,
     );
 
-    return answer;
+    const isNew = !id;
+
+    if (isNew) {
+      instance.addDomainEvent(new AnswerCreatedEvent(instance));
+    }
+
+    return instance;
   }
 
   private touch(): void {

@@ -10,6 +10,7 @@ import { AnswersRepository } from "@domain/forum/application/repositories/answer
 import { AnswerAttachmentsRepository } from "@domain/forum/application/repositories/answer-attachments.repository";
 
 import { InMemory } from "./in-memory";
+import { DomainEvents } from "@domain/core/events/domain-events";
 
 export class InMemoryAnswersRepository
   extends InMemory<Answer>
@@ -32,6 +33,16 @@ export class InMemoryAnswersRepository
       }),
       base.id,
     );
+  }
+
+  async create(answer: Answer): Promise<void> {
+    super.create(answer);
+
+    if (answer.attachments) {
+      await this.syncAttachments(answer.attachments);
+    }
+
+    DomainEvents.dispatchEventsFor(answer.id);
   }
 
   async save(saving: Answer): Promise<void> {
