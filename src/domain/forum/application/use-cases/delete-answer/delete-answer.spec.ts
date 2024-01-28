@@ -37,13 +37,13 @@ describe("Delete Answer [Use Case]", () => {
   it("should delete a answer", async () => {
     //prepare
     const authorId = UniqueId.create();
-    const victim = makeAnswer({
+    const answer = makeAnswer({
       authorId,
     });
 
-    await answersRepository.create(victim);
+    await answersRepository.create(answer);
 
-    const answerId = victim.getId();
+    const answerId = answer.getId();
     const actorId = authorId.getId();
 
     //act
@@ -55,19 +55,22 @@ describe("Delete Answer [Use Case]", () => {
     const deleted = await answersRepository.findById(answerId);
 
     expect(deleted).toBeUndefined();
-    expect(answersRepository.delete).toHaveBeenNthCalledWith(1, victim);
+    expect(answersRepository.delete).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ id: answer.id }),
+    );
   });
 
   it("should throw an error if actor is not the author", async () => {
     //prepare
     const authorId = UniqueId.create();
-    const victim = makeAnswer({
+    const answer = makeAnswer({
       authorId,
     });
 
-    await answersRepository.create(victim);
+    await answersRepository.create(answer);
 
-    const answerId = victim.getId();
+    const answerId = answer.getId();
     const actorId = UniqueId.getId();
 
     expect(authorId.getId()).not.toBe(actorId);

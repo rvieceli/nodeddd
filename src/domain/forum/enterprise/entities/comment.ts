@@ -1,4 +1,4 @@
-import { Entity } from "@domain/core/entities/entity";
+import { AggregateRoot } from "@domain/core/entities/aggregate-root";
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import type { Optional } from "@domain/core/types/optional";
@@ -16,7 +16,7 @@ const EXCERPT_LENGTH = 120;
 
 export abstract class Comment<
   Props extends CommentProps,
-> extends Entity<Props> {
+> extends AggregateRoot<Props> {
   private touch() {
     this.props.updatedAt = new Date();
   }

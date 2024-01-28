@@ -1,5 +1,7 @@
 import { UniqueId } from "@domain/core/entities/unique-id";
 
+import { AnswerCommentCreatedEvent } from "../events/answer-comment-created.event";
+
 import { Comment, type CreateCommentProps, type CommentProps } from "./comment";
 
 interface AnswerCommentProps extends CommentProps {
@@ -12,7 +14,7 @@ export interface CreateAnswerCommentProps extends CreateCommentProps {
 
 export class AnswerComment extends Comment<AnswerCommentProps> {
   static create(props: CreateAnswerCommentProps, id?: UniqueId): AnswerComment {
-    const answer = new AnswerComment(
+    const instance = new AnswerComment(
       {
         ...props,
         createdAt: props.createdAt ?? new Date(),
@@ -20,7 +22,13 @@ export class AnswerComment extends Comment<AnswerCommentProps> {
       id,
     );
 
-    return answer;
+    const isNew = !id;
+
+    if (isNew) {
+      instance.addDomainEvent(new AnswerCommentCreatedEvent(instance));
+    }
+
+    return instance;
   }
 
   get answerId() {

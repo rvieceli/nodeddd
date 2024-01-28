@@ -2,6 +2,7 @@ import {
   PaginatedRequest,
   PaginatedResponse,
 } from "@domain/core/repository/pagination";
+import { DomainEvents } from "@domain/core/events/domain-events";
 
 import { QuestionCommentsRepository } from "@domain/forum/application/repositories/question-comments.repository";
 import { QuestionComment } from "@domain/forum/enterprise/entities/question-comment";
@@ -23,6 +24,12 @@ export class InMemoryQuestionCommentsRepository
       }),
       base.id,
     );
+  }
+
+  async create(creating: QuestionComment): Promise<void> {
+    await super.create(creating);
+
+    DomainEvents.dispatchEventsFor(creating.id);
   }
 
   async findManyByQuestionId(
