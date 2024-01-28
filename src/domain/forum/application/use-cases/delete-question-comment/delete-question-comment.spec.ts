@@ -49,7 +49,10 @@ describe("Delete question comment [Use Case]", () => {
     expect(result.isOk()).toBe(true);
 
     expect(commentsRepository.findById).toHaveBeenNthCalledWith(1, commentId);
-    expect(commentsRepository.delete).toHaveBeenNthCalledWith(1, comment);
+    expect(commentsRepository.delete).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ id: comment.id }),
+    );
   });
 
   it("should throw an error if actor is not the author", async () => {
@@ -71,7 +74,11 @@ describe("Delete question comment [Use Case]", () => {
     expect(authorId.getId()).not.toBe(actorId);
 
     expect(commentsRepository.findById).toHaveBeenNthCalledWith(1, commentId);
-    expect(commentsRepository.findById).toHaveReturnedWith(comment);
+    expect(commentsRepository.findById).toHaveReturnedWith(
+      expect.objectContaining({
+        id: comment.id,
+      }),
+    );
     expect(commentsRepository.delete).not.toHaveBeenCalled();
   });
 

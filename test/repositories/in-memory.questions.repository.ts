@@ -10,6 +10,7 @@ import { QuestionsRepository } from "@domain/forum/application/repositories/ques
 import { QuestionAttachmentsRepository } from "@domain/forum/application/repositories/question-attachments.repository";
 
 import { InMemory } from "./in-memory";
+import { DomainEvents } from "@domain/core/events/domain-events";
 
 export class InMemoryQuestionsRepository
   extends InMemory<Question>
@@ -43,6 +44,8 @@ export class InMemoryQuestionsRepository
     if (saving.attachments) {
       await this.syncAttachments(saving.attachments);
     }
+
+    DomainEvents.dispatchEventsFor(saving.id);
   }
 
   private async syncAttachments(attachmentList: QuestionAttachmentList) {

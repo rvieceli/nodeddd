@@ -46,20 +46,20 @@ export abstract class InMemory<Entity extends EntityBase<unknown>> {
     this.store = this.store.filter((item) => !predicate(item));
   }
 
-  async create(answer: Entity): Promise<void> {
-    this.push(answer);
+  async create(creating: Entity): Promise<void> {
+    this.push(creating);
   }
 
-  async save(answer: Entity): Promise<void> {
-    this.replace(answer);
+  async save(updating: Entity): Promise<void> {
+    this.replace(updating);
   }
 
   async delete(deleting: Entity): Promise<void> {
-    this.remove((answer) => answer.id.equals(deleting));
+    this.remove((entity) => entity.id.equals(deleting));
   }
 
   async findById(id: PrimitiveUniqueId): Promise<Entity | undefined> {
-    return this.find((answer) => answer.id.equals(id));
+    return this.find((entity) => entity.id.equals(id));
   }
 
   protected paginationToSlice(pagination: PaginatedRequest): [number, number] {

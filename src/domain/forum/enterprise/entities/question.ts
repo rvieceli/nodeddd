@@ -5,6 +5,7 @@ import type { Optional } from "@domain/core/types/optional";
 import { Slug } from "./value-objects/slug";
 
 import { QuestionAttachmentList } from "./question-attachment-list";
+import { QuestionBestAnswerChosenEvent } from "../events/question-best-answer-chosen.event";
 
 interface QuestionProps {
   title: string;
@@ -94,6 +95,16 @@ export class Question extends AggregateRoot<QuestionProps> {
   }
 
   set bestAnswerId(value: UniqueId | undefined) {
+    const isDefining = !!value && !this.props.bestAnswerId;
+    const isChanging =
+      !!value &&
+      !!this.props.bestAnswerId &&
+      !value.equals(this.props.bestAnswerId);
+
+    if (isDefining || isChanging) {
+      this.addDomainEvent(new QuestionBestAnswerChosenEvent(this, value));
+    }
+
     this.props.bestAnswerId = value;
     this.touch();
   }
