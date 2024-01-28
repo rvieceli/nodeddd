@@ -2,6 +2,7 @@ import { UniqueId } from "./unique-id";
 
 export abstract class Entity<Props> {
   private _id: UniqueId;
+
   protected props: Props;
 
   protected constructor(props: Props, id?: UniqueId) {
@@ -15,6 +16,12 @@ export abstract class Entity<Props> {
 
   getId() {
     return this._id.getId();
+  }
+
+  equals(entity: Entity<Props>): boolean {
+    if (this === entity) return true;
+
+    return this._id.equals(entity);
   }
 
   // get<T extends keyof Props>(key: T): Props[T] {
