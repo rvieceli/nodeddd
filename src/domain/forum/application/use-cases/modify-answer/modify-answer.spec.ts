@@ -1,19 +1,21 @@
 import { makeAnswer } from "@test/factories/make-answer";
+import { makeAnswerAttachment } from "@test/factories/make-answer-attachment";
+import { makeMany } from "@test/factories/make-many";
 
 import { InMemoryAnswersRepository } from "@test/repositories/in-memory.answers.repository";
+import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/in-memory.answers-attachments.repository";
 
 import { UniqueId } from "@domain/core/entities/unique-id";
+
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 import { AnswerNotFound } from "../../errors/answers.errors";
 import { AnswerModificationNotAllowed } from "../../errors/answers.errors";
 
 import { AnswersRepository } from "../../repositories/answers.repository";
+import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
 
 import { ModifyAnswerUseCase } from "./modify-answer";
-import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
-import { InMemoryAnswerAttachmentsRepository } from "@test/repositories/in-memory.answers-attachments.repository";
-import { makeMany } from "@test/factories/make-many";
-import { makeAnswerAttachment } from "@test/factories/make-answer-attachment";
 
 describe("Modify Answer [Use Case]", () => {
   let answersRepository: AnswersRepository;
@@ -43,7 +45,7 @@ describe("Modify Answer [Use Case]", () => {
     const authorId = UniqueId.create();
 
     const original = makeAnswer({
-      content: "Old content",
+      content: text`Old content`,
       authorId,
     });
 
@@ -64,7 +66,7 @@ describe("Modify Answer [Use Case]", () => {
     expect(original).not.toMatchObject(updated);
     expect(updated).toMatchObject({
       props: {
-        content: "New content",
+        content: text`New content`,
       },
     });
     expect(answersRepository.save).toHaveBeenNthCalledWith(1, updated);
@@ -79,7 +81,7 @@ describe("Modify Answer [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const original = makeAnswer({
-        content: "Old content",
+        content: text`Old content`,
         authorId,
       });
 
@@ -112,7 +114,7 @@ describe("Modify Answer [Use Case]", () => {
       expect(updated.attachments?.currentItems).toHaveLength(1);
       expect(updated).toMatchObject({
         props: {
-          content: "New content",
+          content: text`New content`,
         },
       });
       expect(answersRepository.save).toHaveBeenNthCalledWith(1, updated);
@@ -126,7 +128,7 @@ describe("Modify Answer [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const original = makeAnswer({
-        content: "Old content",
+        content: text`Old content`,
         authorId,
       });
 
@@ -155,7 +157,7 @@ describe("Modify Answer [Use Case]", () => {
       expect(original).not.toMatchObject(updated);
       expect(updated).toMatchObject({
         props: {
-          content: "New content",
+          content: text`New content`,
         },
       });
 
@@ -178,7 +180,7 @@ describe("Modify Answer [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const original = makeAnswer({
-        content: "Old content",
+        content: text`Old content`,
         authorId,
       });
 
@@ -207,7 +209,7 @@ describe("Modify Answer [Use Case]", () => {
       expect(original).not.toMatchObject(updated);
       expect(updated).toMatchObject({
         props: {
-          content: "Old content",
+          content: text`Old content`,
         },
       });
 
@@ -232,7 +234,7 @@ describe("Modify Answer [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const answer = makeAnswer({
-        content: "Old content",
+        content: text`Old content`,
         authorId,
       });
 

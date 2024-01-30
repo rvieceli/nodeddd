@@ -6,6 +6,7 @@ import {
   CreateQuestionCommentProps,
   QuestionComment,
 } from "@domain/forum/enterprise/entities/question-comment";
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 export function makeQuestionComment(
   override?: Partial<CreateQuestionCommentProps>,
@@ -13,7 +14,7 @@ export function makeQuestionComment(
 ) {
   return QuestionComment.create(
     {
-      content: faker.lorem.paragraph(),
+      content: Text.create(faker.lorem.paragraph()),
       authorId: UniqueId.create(),
       questionId: UniqueId.create(),
       ...override,

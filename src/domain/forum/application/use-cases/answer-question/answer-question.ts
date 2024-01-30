@@ -8,6 +8,7 @@ import { UseCase } from "@domain/core/use-cases/use-case";
 import { Answer } from "@domain/forum/enterprise/entities/answer";
 import { AnswerAttachmentList } from "@domain/forum/enterprise/entities/answer-attachment-list";
 import { AnswerAttachment } from "@domain/forum/enterprise/entities/answer-attachment";
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 import { QuestionNotFound } from "../../errors/questions.errors";
 
@@ -48,7 +49,7 @@ export class AnswerQuestionUseCase
     }
 
     const answer = Answer.create({
-      content,
+      content: Text.create(content),
       questionId: question.id,
       authorId: UniqueId.create(actorId),
     });

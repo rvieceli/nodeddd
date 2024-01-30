@@ -7,6 +7,7 @@ import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questi
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import { QuestionComment } from "@domain/forum/enterprise/entities/question-comment";
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 import { QuestionNotFound } from "../../errors/questions.errors";
 
@@ -60,7 +61,7 @@ describe("Comment on Question [Use Case]", () => {
     //assert
     expect(comment).toBeInstanceOf(QuestionComment);
     expect(comment).toMatchObject({
-      content: "This is a comment",
+      content: text`This is a comment`,
       questionId: question.id,
       authorId: UniqueId.create(actorId),
     });

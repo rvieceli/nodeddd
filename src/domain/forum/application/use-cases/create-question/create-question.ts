@@ -8,6 +8,7 @@ import { UseCase } from "@domain/core/use-cases/use-case";
 import { Question } from "@domain/forum/enterprise/entities/question";
 import { QuestionAttachment } from "@domain/forum/enterprise/entities/question-attachment";
 import { QuestionAttachmentList } from "@domain/forum/enterprise/entities/question-attachment-list";
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 import { QuestionsRepository } from "../../repositories/questions.repository";
 
@@ -38,8 +39,8 @@ export class CreateQuestionUseCase
   }: CreateQuestionUseCaseRequest): Promise<CreateQuestionUseCaseResponse> {
     const question = Question.create({
       authorId: UniqueId.create(authorId),
-      title,
-      content,
+      title: Text.create(title),
+      content: Text.create(content),
     });
 
     const attachments = attachmentIds?.map((id) =>

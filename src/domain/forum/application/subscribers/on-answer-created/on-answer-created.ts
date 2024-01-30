@@ -37,7 +37,7 @@ export class OnAnswerCreatedHandler implements DomainEventHandler {
     await this._sendNotification.execute({
       recipientId: question.authorId.getId(),
       title: `Your question "${question.title}" has a new answer`,
-      content: answer.excerpt,
+      content: answer.content.excerpt(),
     });
   }
 }

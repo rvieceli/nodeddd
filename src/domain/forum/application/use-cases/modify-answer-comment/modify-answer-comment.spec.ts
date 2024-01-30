@@ -4,6 +4,8 @@ import { InMemoryAnswerCommentsRepository } from "@test/repositories/in-memory.a
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
+
 import {
   AnswerCommentNotFound,
   AnswerCommentModificationNotAllowed,
@@ -34,7 +36,7 @@ describe("Modify answer comment [Use Case]", () => {
     const authorId = UniqueId.create();
 
     const original = makeAnswerComment({
-      content: "Old content",
+      content: text`Old content`,
       authorId,
     });
 
@@ -59,7 +61,7 @@ describe("Modify answer comment [Use Case]", () => {
 
     expect(updated).toMatchObject({
       props: {
-        content: "New content",
+        content: text`New content`,
       },
     });
 
@@ -75,7 +77,7 @@ describe("Modify answer comment [Use Case]", () => {
     const authorId = UniqueId.create();
 
     const comment = makeAnswerComment({
-      content: "Old content",
+      content: text`Old content`,
       authorId,
     });
 

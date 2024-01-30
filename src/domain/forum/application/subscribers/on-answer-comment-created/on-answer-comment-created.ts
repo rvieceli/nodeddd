@@ -39,7 +39,7 @@ export class OnAnswerCommentCreatedHandler implements DomainEventHandler {
     await this._sendNotification.execute({
       recipientId: answer.authorId.getId(),
       title: `You've received a new comment`,
-      content: `Your answer ${answer.excerpt} has received a comment: ${answerComment.excerpt}`,
+      content: `Your answer ${answer.content.excerpt(60)} has received a comment: ${answerComment.content.excerpt(120)}`,
     });
   }
 }

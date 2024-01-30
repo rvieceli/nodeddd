@@ -3,6 +3,8 @@ import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questi
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
+
 import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
 
@@ -39,10 +41,12 @@ describe("Create Question [UseCase]", () => {
     // assert
     const { question } = result.unwrap();
 
-    expect(question).toMatchObject({
-      title: "New question",
-      content: "New question content",
-    });
+    expect(question).toMatchObject(
+      expect.objectContaining({
+        title: text`New question`,
+        content: text`New question content`,
+      }),
+    );
 
     expect(questionsRepository.create).toHaveBeenNthCalledWith(1, question);
   });

@@ -6,6 +6,7 @@ import { Result } from "@domain/core/errors/result";
 import { UseCase } from "@domain/core/use-cases/use-case";
 
 import { AnswerComment } from "@domain/forum/enterprise/entities/answer-comment";
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 import { AnswerNotFound } from "../../errors/answers.errors";
 
@@ -47,7 +48,7 @@ export class CommentOnAnswerUseCase
     const comment = AnswerComment.create({
       answerId: answer.id,
       authorId: UniqueId.create(actorId),
-      content,
+      content: Text.create(content),
     });
 
     await this._answerCommentsRepository.create(comment);

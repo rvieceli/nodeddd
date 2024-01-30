@@ -6,6 +6,7 @@ import {
   CreateAnswerProps,
   Answer,
 } from "@domain/forum/enterprise/entities/answer";
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 export function makeAnswer(
   override?: Partial<CreateAnswerProps>,
@@ -13,7 +14,7 @@ export function makeAnswer(
 ) {
   return Answer.create(
     {
-      content: faker.lorem.paragraph(),
+      content: Text.create(faker.lorem.paragraph()),
       authorId: UniqueId.create(),
       questionId: UniqueId.create(),
       ...override,

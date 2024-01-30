@@ -7,6 +7,8 @@ import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questi
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
+
 import { AnswersRepository } from "../../repositories/answers.repository";
 import { AnswerAttachmentsRepository } from "../../repositories/answer-attachments.repository";
 import { QuestionsRepository } from "../../repositories/questions.repository";
@@ -66,7 +68,7 @@ describe("Answer question [UseCase]", () => {
 
     //assert
     expect(answer).toMatchObject({
-      content: "New reply",
+      content: text`New reply`,
       questionId: question.id,
       authorId: UniqueId.create(actorId),
     });

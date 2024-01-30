@@ -1,14 +1,7 @@
-export class Slug {
-  private _value: string;
+import { ValueObject } from "@domain/core/entities/value-object";
+import { Text } from "./text";
 
-  constructor(text: string) {
-    this._value = text;
-  }
-
-  get value(): string {
-    return this._value;
-  }
-
+export class Slug extends ValueObject<string> {
   equals(value: string): boolean {
     return this._value === value;
   }
@@ -22,8 +15,10 @@ export class Slug {
    * @param id string
    * @returns Slug
    */
-  static fromString(text: string): Slug {
-    const slug = text
+  static fromString(text: string | Text): Slug {
+    const _text = text instanceof Text ? text.value : text;
+
+    const slug = _text
       .normalize("NFKD")
       .toLowerCase()
       .trim()

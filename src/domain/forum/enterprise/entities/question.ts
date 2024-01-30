@@ -6,10 +6,11 @@ import { Slug } from "./value-objects/slug";
 
 import { QuestionAttachmentList } from "./question-attachment-list";
 import { QuestionBestAnswerChosenEvent } from "../events/question-best-answer-chosen.event";
+import { Text } from "./value-objects/text";
 
 interface QuestionProps {
-  title: string;
-  content: string;
+  title: Text;
+  content: Text;
   slug: Slug;
   authorId: UniqueId;
   attachments?: QuestionAttachmentList;
@@ -19,8 +20,6 @@ interface QuestionProps {
 }
 
 export type CreateQuestionProps = Optional<QuestionProps, "slug" | "createdAt">;
-
-const EXCERPT_LENGTH = 120;
 
 export class Question extends AggregateRoot<QuestionProps> {
   static create(props: CreateQuestionProps, id?: UniqueId): Question {
@@ -40,18 +39,12 @@ export class Question extends AggregateRoot<QuestionProps> {
     this.props.updatedAt = new Date();
   }
 
-  get title(): string {
+  get title(): Text {
     return this.props.title;
   }
 
-  get content(): string {
+  get content(): Text {
     return this.props.content;
-  }
-
-  get excerpt(): string {
-    if (this.props.content.length <= EXCERPT_LENGTH) return this.props.content;
-
-    return this.props.content.slice(0, EXCERPT_LENGTH - 3).trim() + "...";
   }
 
   get slug(): Slug {
@@ -79,13 +72,13 @@ export class Question extends AggregateRoot<QuestionProps> {
   }
 
   set title(value: string) {
-    this.props.title = value;
+    this.props.title = Text.create(value);
     this.props.slug = Slug.fromString(value);
     this.touch();
   }
 
   set content(value: string) {
-    this.props.content = value;
+    this.props.content = Text.create(value);
     this.touch();
   }
 

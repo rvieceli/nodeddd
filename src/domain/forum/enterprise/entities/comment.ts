@@ -3,16 +3,16 @@ import { UniqueId } from "@domain/core/entities/unique-id";
 
 import type { Optional } from "@domain/core/types/optional";
 
+import { Text } from "./value-objects/text";
+
 export interface CommentProps {
   authorId: UniqueId;
-  content: string;
+  content: Text;
   createdAt: Date;
   updatedAt?: Date;
 }
 
 export type CreateCommentProps = Optional<CommentProps, "createdAt">;
-
-const EXCERPT_LENGTH = 120;
 
 export abstract class Comment<
   Props extends CommentProps,
@@ -21,14 +21,8 @@ export abstract class Comment<
     this.props.updatedAt = new Date();
   }
 
-  get content() {
+  get content(): Text {
     return this.props.content;
-  }
-
-  get excerpt() {
-    if (this.props.content.length <= EXCERPT_LENGTH) return this.props.content;
-
-    return this.props.content.slice(0, EXCERPT_LENGTH - 3).trim() + "...";
   }
 
   get authorId() {
@@ -44,7 +38,7 @@ export abstract class Comment<
   }
 
   set content(value: string) {
-    this.props.content = value;
+    this.props.content = Text.create(value);
     this.touch();
   }
 }

@@ -4,6 +4,8 @@ import { InMemoryQuestionCommentsRepository } from "@test/repositories/in-memory
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
+
 import {
   QuestionCommentNotFound,
   QuestionCommentModificationNotAllowed,
@@ -34,7 +36,7 @@ describe("Modify question comment [Use Case]", () => {
     const authorId = UniqueId.create();
 
     const original = makeQuestionComment({
-      content: "Old content",
+      content: text`Old content`,
       authorId,
     });
 
@@ -58,7 +60,7 @@ describe("Modify question comment [Use Case]", () => {
     expect(original).not.toMatchObject(updated);
     expect(updated).toMatchObject({
       props: {
-        content: "New content",
+        content: text`New content`,
       },
     });
     expect(questionCommentsRepository.findById).toHaveBeenNthCalledWith(
@@ -73,7 +75,7 @@ describe("Modify question comment [Use Case]", () => {
     const authorId = UniqueId.create();
 
     const comment = makeQuestionComment({
-      content: "Old content",
+      content: text`Old content`,
       authorId,
     });
 

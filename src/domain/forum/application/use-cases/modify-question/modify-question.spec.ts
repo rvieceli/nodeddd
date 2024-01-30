@@ -7,6 +7,8 @@ import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-mem
 
 import { UniqueId } from "@domain/core/entities/unique-id";
 
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
+
 import {
   QuestionNotFound,
   QuestionModificationNotAllowed,
@@ -45,8 +47,8 @@ describe("Modify Question [Use Case]", () => {
     const authorId = UniqueId.create();
 
     const original = makeQuestion({
-      content: "Old content",
-      title: "Old title",
+      content: text`Old content`,
+      title: text`Old title`,
       authorId,
     });
 
@@ -66,12 +68,12 @@ describe("Modify Question [Use Case]", () => {
 
     // assert
     expect(original).not.toMatchObject(updated);
-    expect(updated).toMatchObject({
-      props: {
-        content: "New content",
-        title: "New title",
-      },
-    });
+    expect(updated).toMatchObject(
+      expect.objectContaining({
+        content: text`New content`,
+        title: text`New title`,
+      }),
+    );
     expect(questionsRepository.save).toHaveBeenNthCalledWith(1, updated);
     expect(
       questionAttachmentsRepository.findManyByQuestionId,
@@ -84,8 +86,8 @@ describe("Modify Question [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const original = makeQuestion({
-        content: "Old content",
-        title: "Old title",
+        content: text`Old content`,
+        title: text`Old title`,
         authorId,
       });
 
@@ -115,11 +117,11 @@ describe("Modify Question [Use Case]", () => {
 
       // assert
       expect(original).not.toMatchObject(updated);
-      expect(updated).toMatchObject({
-        props: {
-          title: "New title",
-        },
-      });
+      expect(updated).toMatchObject(
+        expect.objectContaining({
+          title: text`New title`,
+        }),
+      );
 
       expect(updated.attachments?.currentItems).toHaveLength(1);
 
@@ -134,8 +136,8 @@ describe("Modify Question [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const original = makeQuestion({
-        content: "Old content",
-        title: "Old title",
+        content: text`Old content`,
+        title: text`Old title`,
         authorId,
       });
 
@@ -162,11 +164,11 @@ describe("Modify Question [Use Case]", () => {
 
       // assert
       expect(original).not.toMatchObject(updated);
-      expect(updated).toMatchObject({
-        props: {
-          title: "New title",
-        },
-      });
+      expect(updated).toMatchObject(
+        expect.objectContaining({
+          title: text`New title`,
+        }),
+      );
 
       expect(updated.attachments).toBeUndefined();
 
@@ -190,8 +192,8 @@ describe("Modify Question [Use Case]", () => {
       const authorId = UniqueId.create();
 
       const question = makeQuestion({
-        content: "Old content",
-        title: "Old title",
+        content: text`Old content`,
+        title: text`Old title`,
         authorId,
       });
 

@@ -3,6 +3,8 @@ import { makeQuestion } from "@test/factories/make-question";
 import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-memory.question-attachments.repository";
 import { InMemoryQuestionsRepository } from "@test/repositories/in-memory.questions.repository";
 
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
+
 import { QuestionNotFound } from "../../errors/questions.errors";
 
 import { QuestionAttachmentsRepository } from "../../repositories/question-attachments.repository";
@@ -33,7 +35,7 @@ describe("Get Question By Slug [UseCase]", () => {
   it("should return a question", async () => {
     // prepare
     const original = makeQuestion({
-      title: "This is a question",
+      title: Text.create("This is a question"),
     });
 
     questionsRepository.create(original);

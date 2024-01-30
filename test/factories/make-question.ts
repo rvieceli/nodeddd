@@ -6,6 +6,7 @@ import {
   CreateQuestionProps,
   Question,
 } from "@domain/forum/enterprise/entities/question";
+import { Text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 export function makeQuestion(
   override?: Partial<CreateQuestionProps>,
@@ -13,8 +14,8 @@ export function makeQuestion(
 ) {
   return Question.create(
     {
-      title: faker.lorem.sentence(),
-      content: faker.lorem.paragraph(),
+      title: Text.create(faker.lorem.sentence()),
+      content: Text.create(faker.lorem.paragraph()),
       authorId: UniqueId.create(),
       ...override,
     },

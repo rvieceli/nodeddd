@@ -2,11 +2,14 @@ import { AggregateRoot } from "@domain/core/entities/aggregate-root";
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import type { Optional } from "@domain/core/types/optional";
-import { AnswerAttachmentList } from "./answer-attachment-list";
+
 import { AnswerCreatedEvent } from "../events/answer-created.event";
 
+import { AnswerAttachmentList } from "./answer-attachment-list";
+import { Text } from "./value-objects/text";
+
 interface AnswerProps {
-  content: string;
+  content: Text;
   questionId: UniqueId;
   authorId: UniqueId;
   attachments?: AnswerAttachmentList;
@@ -15,8 +18,6 @@ interface AnswerProps {
 }
 
 export type CreateAnswerProps = Optional<AnswerProps, "createdAt">;
-
-const EXCERPT_LENGTH = 120;
 
 export class Answer extends AggregateRoot<AnswerProps> {
   static create(props: CreateAnswerProps, id?: UniqueId): Answer {
@@ -41,14 +42,8 @@ export class Answer extends AggregateRoot<AnswerProps> {
     this.props.updatedAt = new Date();
   }
 
-  get content(): string {
+  get content(): Text {
     return this.props.content;
-  }
-
-  get excerpt(): string {
-    if (this.props.content.length <= EXCERPT_LENGTH) return this.props.content;
-
-    return this.props.content.slice(0, EXCERPT_LENGTH - 3).trim() + "...";
   }
 
   get questionId() {
@@ -72,7 +67,7 @@ export class Answer extends AggregateRoot<AnswerProps> {
   }
 
   set content(value: string) {
-    this.props.content = value;
+    this.props.content = Text.create(value);
     this.touch();
   }
 

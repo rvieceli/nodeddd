@@ -10,6 +10,7 @@ import { InMemoryQuestionAttachmentsRepository } from "@test/repositories/in-mem
 import { UniqueId } from "@domain/core/entities/unique-id";
 
 import { AnswerComment } from "@domain/forum/enterprise/entities/answer-comment";
+import { text } from "@domain/forum/enterprise/entities/value-objects/text";
 
 import { AnswerNotFound } from "../../errors/answers.errors";
 
@@ -76,7 +77,7 @@ describe("Comment on Answer [Use Case]", () => {
     //assert
     expect(comment).toBeInstanceOf(AnswerComment);
     expect(comment).toMatchObject({
-      content: "This is a comment",
+      content: text`This is a comment`,
       answerId: answer.id,
       authorId: UniqueId.create(actorId),
     });

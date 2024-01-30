@@ -38,7 +38,7 @@ export class OnQuestionBestAnswerChosenHandler implements DomainEventHandler {
     this._sendNotification.execute({
       recipientId: answer.authorId.getId(),
       title: `Your answer was chosen as the best answer`,
-      content: `Your answer "${answer.excerpt}" was chosen as the best answer for the question "${question.title}"`,
+      content: `Your answer "${answer.content.excerpt()}" was chosen as the best answer for the question "${question.title.toString()}"`,
     });
   }
 }

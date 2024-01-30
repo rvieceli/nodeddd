@@ -12,7 +12,7 @@ export class DomainEvents {
   > = {};
   private static marked: AggregateRoot<unknown>[] = [];
 
-  public static markForDispatch(entity: AggregateRoot<unknown>) {
+  public static add(entity: AggregateRoot<unknown>) {
     const found = !!this.findMarkedByID(entity.id);
 
     if (found) return;
