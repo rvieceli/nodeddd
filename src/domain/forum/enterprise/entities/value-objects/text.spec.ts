@@ -30,13 +30,36 @@ describe("Text [Value Object]", () => {
     expect(val.excerpt(16)).toBe("test of somet...");
   });
 
-  it("tag function should return Text instance", () => {
-    const val1 = Text.create("test");
-    const literals = text`test`;
+  describe("text function", () => {
+    it("tag function should return Text instance", () => {
+      const val1 = Text.create("test");
+      const literals = text`test`;
 
-    expect(val1).toBeInstanceOf(Text);
-    expect(literals).toBeInstanceOf(Text);
-    expect(val1).not.toBe(literals);
-    expect(val1.equals(literals.value)).toBe(true);
+      expect(val1).toBeInstanceOf(Text);
+      expect(literals).toBeInstanceOf(Text);
+      expect(val1).not.toBe(literals);
+      expect(val1.equals(literals.value)).toBe(true);
+    });
+
+    it("could receive a template string", () => {
+      const str = text`test`;
+
+      expect(str).toBeInstanceOf(Text);
+      expect(str.value).toBe("test");
+    });
+
+    it("could receive a template string with substitutions", () => {
+      const str = text`test ${"of"} something is ${10}`;
+
+      expect(str).toBeInstanceOf(Text);
+      expect(str.value).toBe("test of something is 10");
+    });
+
+    it("could receive a string", () => {
+      const str = text("test");
+
+      expect(str).toBeInstanceOf(Text);
+      expect(str.value).toBe("test");
+    });
   });
 });

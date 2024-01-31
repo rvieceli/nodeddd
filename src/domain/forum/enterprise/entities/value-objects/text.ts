@@ -22,8 +22,19 @@ export class Text extends ValueObject<string> {
   }
 }
 
-export function text<T>(template: TemplateStringsArray, ...substitutions: T[]) {
-  const string = String.raw(template, ...substitutions);
+export function text(text: string): Text;
+export function text(
+  template: TemplateStringsArray,
+  ...substitutions: unknown[]
+): Text;
+export function text(
+  templateOrText: TemplateStringsArray | string,
+  ...substitutions: unknown[]
+) {
+  const string =
+    typeof templateOrText === "string"
+      ? templateOrText
+      : String.raw(templateOrText, ...substitutions);
 
   return Text.create(string);
 }
